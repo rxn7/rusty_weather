@@ -44,3 +44,32 @@ impl ToString for Location {
         return format!("{}°, {}° ({}, {}, {})", self.latitude, self.longitude, self.city.as_str(), self.administration.as_str(), self.country.as_str());
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn from_city_name_oslo() {
+        let location = Location::from_city_name("Oslo").unwrap();
+        assert_eq!(location.city, "Oslo");
+        assert_eq!(location.administration, "Oslo County");
+        assert_eq!(location.country, "Norway");
+    }
+
+    #[test]
+    fn from_city_name_copenhagen() {
+        let location = Location::from_city_name("Copenhagen").unwrap();
+        assert_eq!(location.city, "Copenhagen");
+        assert_eq!(location.administration, "Capital Region");
+        assert_eq!(location.country, "Denmark");
+    }
+
+    #[test]
+    fn from_city_name_krakow() {
+        let location = Location::from_city_name("Krakow").unwrap();
+        assert_eq!(location.city, "Krakow");
+        assert_eq!(location.administration, "Lesser Poland");
+        assert_eq!(location.country, "Poland");
+    }
+}

@@ -15,8 +15,11 @@ enum InputMode {
 
 fn main() {
     let location: Location = input_location();
-    let weather: Weather = api::get_weather(location);
-    println!("\n{}", weather.to_string());
+    let weather = api::get_weather(location);
+    match weather {
+        Some(weather) => println!("\n{}", weather.to_string()),
+        None => println!("Failed to get weather from api"),
+    }
 }
 
 fn input_location() -> Location {
