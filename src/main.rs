@@ -7,8 +7,6 @@ mod prelude {
     pub use crate::location::*;
 }
 use prelude::*;
-use ureq::serde_json;
-use ureq::Response;
 
 enum InputMode {
     Coordinate,
@@ -45,12 +43,12 @@ fn input_location() -> Location {
     }
 
     return match input_mode {
-        InputMode::Coordinate => read_location(),
-        InputMode::City => read_city(),
+        InputMode::Coordinate => read_input_location(),
+        InputMode::City => read_input_city(),
     };
 }
 
-fn read_location() -> Location {
+fn read_input_location() -> Location {
     fn read_coordinate(name: &'static str, min_valid: f64, max_valid: f64) -> f64 {
         loop {
             println!("Enter {}: ", name);
@@ -78,15 +76,15 @@ fn read_location() -> Location {
     let longitude: f64 = read_coordinate("longitude", -180.0, 180.0);
 
     return Location {
+        city: "".to_string(),
+        administration: "".to_string(),
+        country: "".to_string(),
         latitude,
         longitude,
     };
 }
 
-fn read_city() -> Location {
-    let latitude: f64;
-    let longitude: f64;
-
+fn read_input_city() -> Location {
     loop {
         println!("Enter city name: ");
         let mut input = String::new();
@@ -95,39 +93,13 @@ fn read_city() -> Location {
             .expect("Failed to read input");
 
         let city_input: String = input.trim().to_string();
-
-        let req_url: String = format!(
-            "https://geocoding-api.open-meteo.com/v1/search?name={}",
-            city_input
-        );
-
-        let res: Response = ureq::get(req_url.as_str()).call().unwrap();
-        let json: serde_json::Value = res.into_json().unwrap();
-        let results: &[serde_json::Value];
-
-        match &json["results"].as_array() {
-            Some(arr) => results = arr,
-            None => {
-                println!("No city of that name found...");
-                continue;
+        match Location::from_city_name(city_input.as_str()) {
+            Ok(loc) => {
+                return loc;
+            },
+            Err(err) => {
+                println!("{}", err);
             }
         }
-
-        let result: &serde_json::Value = &results[0];
-
-        let name: &str = result["name"].as_str().unwrap();
-        let country: &str = result["country"].as_str().unwrap();
-        let administration: &str = result["admin1"].as_str().unwrap_or(country);
-        println!("Found city: {}, {}, {}", name, administration, country);
-
-        latitude = result["latitude"].as_f64().unwrap();
-        longitude = result["longitude"].as_f64().unwrap();
-
-        break;
     }
-
-    return Location {
-        latitude,
-        longitude,
-    };
 }
