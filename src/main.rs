@@ -14,10 +14,10 @@ impl ToString for Location {
 
 struct Weather {
     location: Location,
-    temperature_celsius: f64,
-    apparent_temperature_celsius: f64,
-    wind_speed: f64,
-    humidity: f64,
+    temperature_celsius: f32,
+    apparent_temperature_celsius: f32,
+    wind_speed: f32,
+    humidity: f32,
 }
 
 enum InputMode {
@@ -133,8 +133,10 @@ fn input_location() -> Location {
 
             let result: &serde_json::Value = &results[0];
 
-            let found_city = result["name"].as_str().unwrap();
-            println!("Found city: {}", found_city);
+            let name: &str = result["name"].as_str().unwrap();
+            let country: &str = result["country"].as_str().unwrap();
+            let administration: &str = result["admin1"].as_str().unwrap_or(country);
+            println!("Found city: {}, {}, {}", name, administration, country);
 
             latitude = result["latitude"].as_f64().unwrap();
             longitude = result["longitude"].as_f64().unwrap();
@@ -158,9 +160,9 @@ fn get_weather_from_api(location: Location) -> Weather {
 
     return Weather {
         location: location,
-        temperature_celsius: weather_json["temperature_2m"].as_f64().unwrap(),
-        apparent_temperature_celsius: weather_json["apparent_temperature"].as_f64().unwrap(),
-        wind_speed: weather_json["wind_speed_10m"].as_f64().unwrap(),
-        humidity: weather_json["relative_humidity_2m"].as_f64().unwrap(),
+        temperature_celsius: weather_json["temperature_2m"].as_f64().unwrap() as f32,
+        apparent_temperature_celsius: weather_json["apparent_temperature"].as_f64().unwrap() as f32,
+        wind_speed: weather_json["wind_speed_10m"].as_f64().unwrap() as f32,
+        humidity: weather_json["relative_humidity_2m"].as_f64().unwrap() as f32,
     };
 }
