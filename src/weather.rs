@@ -1,4 +1,4 @@
-use crate::location::Location;
+use crate::prelude::*;
 use ureq::serde_json;
 
 pub struct Weather {

@@ -2,10 +2,13 @@ mod api;
 mod location;
 mod weather;
 
-use location::Location;
+mod prelude {
+    pub use crate::weather::*;
+    pub use crate::location::*;
+}
+use prelude::*;
 use ureq::serde_json;
 use ureq::Response;
-use weather::Weather;
 
 enum InputMode {
     Coordinate,

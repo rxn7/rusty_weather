@@ -1,5 +1,4 @@
-use crate::location::Location;
-use crate::weather::Weather;
+use crate::prelude::*;
 use ureq::serde_json;
 use ureq::Response;
 
